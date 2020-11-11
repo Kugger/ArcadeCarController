@@ -57,7 +57,7 @@ public class CarController : MonoBehaviour
         grounded = false;
         RaycastHit hitOn;
 
-        Debug.DrawLine(transform.position + (-transform.up * .5f), Vector3.down, Color.green);
+        // Debug.DrawLine(transform.position + (-transform.up * .5f), Vector3.down, Color.green);
 
         if (Physics.Raycast(transform.position + (-transform.up * .5f), Vector3.down, out hitOn, 1.1f, GroundMask))
         {
