@@ -32,7 +32,7 @@ public class CarController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        speedInput = 0f;
+        // speedInput = 0f;
         if (Input.GetAxis("Vertical") > 0)
         {
             speedInput = Input.GetAxis("Vertical") * forwardAcceleration * 1000f;
