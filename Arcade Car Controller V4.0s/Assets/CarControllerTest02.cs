@@ -26,14 +26,25 @@ public class CarControllerTest02 : MonoBehaviour
 
     public LayerMask GroundMask;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        sphereCollider.transform.parent = null;
-    }
 
     // Update is called once per frame
     void Update()
+    {
+        transform.position = sphereCollider.transform.position - new Vector3(0, 0.4f, 0);
+
+        if (Input.GetAxis("Vertical") > 0)
+        {
+            speedInput = Input.GetAxis("Vertical") * forwardAcceleration * 1000f;
+        }
+        else if (Input.GetAxis("Vertical") < 0)
+        {
+            speedInput = Input.GetAxis("Vertical") * backwardAcceleration * 1000f;
+        }
+
+        turnInput = Input.GetAxis("Horizontal");
+    }
+
+    private void FixedUpdate()
     {
         
     }
