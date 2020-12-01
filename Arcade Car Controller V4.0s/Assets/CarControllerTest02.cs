@@ -58,18 +58,15 @@ public class CarControllerTest02 : MonoBehaviour
         // Steering
         transform.eulerAngles = Vector3.Lerp(transform.eulerAngles, new Vector3(0, transform.eulerAngles.y, 0), Time.deltaTime * 5f);
 
-        RaycastHit hitOn;
-        RaycastHit hitNear;
+        // Rotating the model based on ground
+        Ray ray = new Ray(transform.position - (transform.up * 1f), -transform.up);
+        RaycastHit hitInfo;
 
-        Physics.Raycast(transform.position + (transform.up * .5f), Vector3.down * 5f, out hitOn, 1.1f, GroundMask);
-        Physics.Raycast(transform.position + (transform.up * .5f), Vector3.down * 5f, out hitNear, 2.0f, GroundMask);
+        Debug.DrawRay(ray.origin, ray.origin + ray.direction * 100f, Color.green);
 
-        Debug.DrawRay(transform.position + (transform.up * .5f), Vector3.down * 5f, Color.red);
-        Debug.DrawRay(transform.position + (transform.up * .5f), Vector3.down * 5f, Color.red);
-
-
-        //Normal Rotation
-        kartNormal.up = Vector3.Lerp(kartNormal.up, hitNear.normal, Time.deltaTime * 8.0f);
-        kartNormal.Rotate(0, transform.eulerAngles.y, 0);
+        if (Physics.Raycast(ray, out hitInfo, 2.0f, GroundMask))
+        {
+            kartModel.rotation = Quaternion.FromToRotation(transform.up, hitInfo.normal) * transform.rotation;
+        }
     }
 }
