@@ -61,7 +61,7 @@ public class CarControllerTest02 : MonoBehaviour
         Ray ray = new Ray(transform.position - (transform.up * 1f), -transform.up);
         RaycastHit hitInfo;
 
-        Debug.DrawRay(ray.origin, ray.origin + ray.direction * 100f, Color.green);
+        Debug.DrawRay(ray.origin, ray.origin + ray.direction * 2f, Color.green);
 
         isGrounded = false;
 
