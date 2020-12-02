@@ -17,23 +17,19 @@ public class CarControllerTest02 : MonoBehaviour
     public float maxSpeed = 50f;
     public float turnStrength = 180f;
     public float gravityForce = 10f;
-    public float dragOnGround = 3f;
+    public LayerMask GroundMask;
 
     private float speedInput;
     private float turnInput;
-
-    private bool grounded;
-
-    public LayerMask GroundMask;
+    private bool isGrounded;
 
 
-    // Update is called once per frame
     void Update()
     {
         // Kart model (box for now 30/11/2020) copies the position of the sphere
         transform.position = sphereCollider.transform.position - new Vector3(0, 0.4f, 0);
 
-        // 
+        // Collecting input about acceleration and steering
         if (Input.GetAxis("Vertical") > 0)
         {
             speedInput = Input.GetAxis("Vertical") * forwardAcceleration * 35f;
@@ -52,11 +48,14 @@ public class CarControllerTest02 : MonoBehaviour
         // Forward Acceleration
         sphereCollider.AddForce(kartModel.transform.forward * speedInput, ForceMode.Acceleration);
 
+
         // Gravity
-        sphereCollider.AddForce(Vector3.down * gravityForce * 10, ForceMode.Acceleration);
+        sphereCollider.AddForce(Vector3.down * gravityForce * 10f, ForceMode.Acceleration);
+
 
         // Steering
         transform.eulerAngles = Vector3.Lerp(transform.eulerAngles, new Vector3(0, transform.eulerAngles.y, 0), Time.deltaTime * 5f);
+
 
         // Rotating the model based on ground
         Ray ray = new Ray(transform.position - (transform.up * 1f), -transform.up);
@@ -64,9 +63,20 @@ public class CarControllerTest02 : MonoBehaviour
 
         Debug.DrawRay(ray.origin, ray.origin + ray.direction * 100f, Color.green);
 
+        isGrounded = false;
+
         if (Physics.Raycast(ray, out hitInfo, 2.0f, GroundMask))
         {
-            kartModel.rotation = Quaternion.FromToRotation(transform.up, hitInfo.normal) * transform.rotation;
+            isGrounded = true;
+
+            kartNormal.up = Vector3.Lerp(kartNormal.up, hitInfo.normal, Time.deltaTime * 8.0f);
+            kartNormal.Rotate(0, transform.eulerAngles.y, 0);
+        }
+
+        // Appling greater gravity force while in air
+        if(!isGrounded)
+        {
+            sphereCollider.AddForce(Vector3.down * gravityForce * 15f, ForceMode.Acceleration);
         }
     }
 }
