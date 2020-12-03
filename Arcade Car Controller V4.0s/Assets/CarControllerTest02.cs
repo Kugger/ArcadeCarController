@@ -27,6 +27,9 @@ public class CarControllerTest02 : MonoBehaviour
     void Update()
     {
         // Kart model (box for now 30/11/2020) copies the position of the sphere
+        // transform.position = sphereCollider.transform.position - new Vector3(0, 0.4f, 0);
+
+        Vector3 updatedPos = new Vector3(sphereCollider.transform.position.x, kartModel.position.y, sphereCollider.transform.position.z);
         transform.position = sphereCollider.transform.position - new Vector3(0, 0.4f, 0);
 
         // Collecting input about acceleration and steering
