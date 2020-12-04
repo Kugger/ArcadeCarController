@@ -15,7 +15,7 @@ public class CarControllerTest02 : MonoBehaviour
     public float forwardAcceleration = 8f;
     public float backwardAcceleration = 4f;
     public float maxSpeed = 50f;
-    public float turnStrength = 180f;
+    public float turnStrength = 10f;
     public float gravityForce = 10f;
     public LayerMask GroundMask;
 
@@ -23,6 +23,8 @@ public class CarControllerTest02 : MonoBehaviour
     private float turnInput;
     private bool isGrounded;
 
+    float speed, currentSpeed;
+    float rotate, currentRotate;
 
     void Update()
     {
@@ -39,8 +41,20 @@ public class CarControllerTest02 : MonoBehaviour
             speedInput = Input.GetAxis("Vertical") * backwardAcceleration * 35f;
         }
 
+        /*
+        if (Input.GetAxis("Horizontal") != 0) 
+        {
+            int direction = Input.GetAxis("Horizontal") > 0 ? 1 : -1;
+            float amount = Mathf.Abs(Input.GetAxis("Horizontal"));
+            Steer(direction, amount);
+        }
+        */
+
         turnInput = Input.GetAxis("Horizontal");
         transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(0f, turnInput * turnStrength * Time.deltaTime * Input.GetAxis("Vertical"), 0f));
+
+        //currentRotate = Mathf.Lerp(currentRotate, rotate, Time.deltaTime * 4f);
+        //rotate = 0f;
     }
 
     private void FixedUpdate()
@@ -55,6 +69,7 @@ public class CarControllerTest02 : MonoBehaviour
 
         // Steering
         transform.eulerAngles = Vector3.Lerp(transform.eulerAngles, new Vector3(0, transform.eulerAngles.y, 0), Time.deltaTime * 5f);
+        // transform.eulerAngles = Vector3.Lerp(transform.eulerAngles, new Vector3(0, transform.eulerAngles.y + currentRotate, 0), Time.deltaTime * 5f);
 
 
         // Rotating the model based on ground
@@ -79,4 +94,11 @@ public class CarControllerTest02 : MonoBehaviour
             sphereCollider.AddForce(Vector3.down * gravityForce * 15f, ForceMode.Acceleration);
         }
     }
+
+    /*
+    public void Steer(int direction, float amount) 
+    {
+        rotate = ((turnStrength * direction) * amount) / 4f;
+    }
+    */
 }
