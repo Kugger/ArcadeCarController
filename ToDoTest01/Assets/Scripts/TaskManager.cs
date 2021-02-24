@@ -16,6 +16,10 @@ public class TaskManager : MonoBehaviour
     [Header("GameObjects")]
     public GameObject addTaskPanel;
     public GameObject checklistItemPrefab;
+    public GameObject DateTestScript;
+    public GameObject wrongDataText;
+
+    DateTest presentTime;
 
     // sciezka do pliku gdzie bedziemy przechowywac nasze taski
     string filePath;
@@ -37,11 +41,34 @@ public class TaskManager : MonoBehaviour
     public Color woodPecker =  new Color(111f, 69f, 14f, 1f);
     public Color sandCastle = new Color(219f, 168f, 66f, 1f);
 
+    [Header("DateAndTimeTexts")]
+    public Text dayText;
+    public Text monthText;
+    public Text yearText;
+    public Text hourText;
+    public Text minuteText;
+
+    [Header("ButtonsUp")]
+    public Button dayButtonUp;
+    public Button monthButtonUp;
+    public Button yearButtonUp;
+    public Button hourButtonUp;
+    public Button minuteButtonUp;
+
+    [Header("ButtonsDown")]
+    public Button dayButtonDown;
+    public Button monthButtonDown;
+    public Button yearButtonDown;
+    public Button hourButtonDown;
+    public Button minuteButtonDown;
+
+    public Button CreateTaskButton;
+
+
+
     void Start()
     {
         filePath = Application.persistentDataPath + "/checklist.txt";
-
-        // addInputFields = addTaskPanel.GetComponentsInChildren<InputField>();
     }
 
     public void createNewTask() 
@@ -49,8 +76,7 @@ public class TaskManager : MonoBehaviour
         string temp = TitleField.text;
         string temp2 = TextField.text;
         createButtonPressed(temp, temp2, hardMint);
-        // Debug.Log(temp);
-        //Title.text = "";
+
     }
 
     public void createButtonPressed(string objTitle, string objText, Color objColor, int objIndex = 0)
@@ -98,28 +124,6 @@ public class TaskManager : MonoBehaviour
         Image[] imageInTask = taskObject.GetComponentsInChildren<Image>();
         imageInTask[1].color = selectedColor;
 
-        // vvv kod do zmiany koloru tla vvv
-        // Image ImageColor = taskObject.GetComponentInChildren<Image>();
-        // ImageColor.color = selectedColor;
-
-
-        // taskObject.GetComponentInChildren<Text>().text = objTitle;
-
-
         tasksList.Add(taskObject);
-        // NewTask temp = taskObject;
-        // taskObject.GetComponent<Toggle>().onValueChanged.AddListener(delegate { })
-
-
-        /*
-        Debug.Log(Title.text);
-
-        taskObject.GetComponentInChildren<Text>().text = Title.text;
-
-        Debug.Log(Title.text);
-        */
-
-        // nadawanie wartosci taskowi
-        //taskLists.GetComponent<Text>().text = Title.text;
     }
 }

@@ -8,16 +8,20 @@ public class DateTest : MonoBehaviour
 {
     public Text dataText;
 
+    public string DTday, DTmonth, DTyear, DTfullyear, DThour, DTminute, DTseconds;
+
     void Update()
     {
-        string days = System.DateTime.UtcNow.ToLocalTime().ToString("dd");
-        string months = System.DateTime.UtcNow.ToLocalTime().ToString("MM");
-        string years = System.DateTime.UtcNow.ToLocalTime().ToString("yy");
+        var presentTime = System.DateTime.UtcNow.ToLocalTime();
 
-        string hours = System.DateTime.UtcNow.ToLocalTime().ToString("HH");
-        string minutes = System.DateTime.UtcNow.ToLocalTime().ToString("mm");
-        string seconds = System.DateTime.UtcNow.ToLocalTime().ToString("ss");
+        DTday = presentTime.ToString("dd");
+        DTmonth = presentTime.ToString("MM");
+        DTyear = presentTime.ToString("yy");
+        DTfullyear = presentTime.ToString("yyyy");
+        DThour = presentTime.ToString("HH");
+        DTminute = presentTime.ToString("mm");
+        DTseconds = presentTime.ToString("ss");
 
-        dataText.text = "Today is " + days + "-" + months + "-" + years + " | " + hours  + ":" + minutes + ":" + seconds;
+        dataText.text = "Today is " + DTday + "-" + DTmonth + "-" + DTyear + " | " + DThour  + ":" + DTminute + ":" + DTseconds;
     }
 }
