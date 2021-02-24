@@ -311,10 +311,9 @@ public class TaskManager : MonoBehaviour
         //CorrectFieldCheck();
         //CorrectDateCheck();
 
-        AddTaskPanelActive(addTaskPanel);
     }
 
-    private void AddTaskPanelActive(GameObject AddTaskPanel)
+    private void OnEnable()
     {
         Debug.Log("Do you see me?");
 
@@ -334,6 +333,8 @@ public class TaskManager : MonoBehaviour
             minYear = presentYear;
             minHour = presentHour;
             minMinute = presentMinute;
+
+            Debug.Log("Tylko raz");
         }
     }
 
@@ -371,7 +372,7 @@ public class TaskManager : MonoBehaviour
         }
     }
 
-    public void CorrectFieldCheck()
+    public bool CorrectFieldCheck()
     {
         if (TitleField.text.Length == 0)
             disabledButton = true;
@@ -395,6 +396,8 @@ public class TaskManager : MonoBehaviour
             CreateTaskButton.interactable = true;
             Debug.Log("CreateButton able" + intMinute + " " + presentMinute);
         }
+
+        return disabledButton;
     }
 
     public void createNewTask() 
