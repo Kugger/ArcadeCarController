@@ -82,7 +82,7 @@ public class TaskManager : MonoBehaviour
     public int maxHour = 23;
     public int maxMinute = 59;
 
-    private int nowDays = 1, nowMonths = 1, nowYears = 1, nowHours = 1, nowMinutes = 1;
+    private int presentDay = 1, presentMonth = 1, presentYear = 1, presentHour = 1, presentMinute = 1;
 
 
     void Start()
@@ -273,11 +273,8 @@ public class TaskManager : MonoBehaviour
         // ograniczanie minimum minut
         if (minMinute >= intMinute & minDay == intDay & minMonth == intMonth & minYear == intYear & minHour == intHour)
         {
-
             intMinute = minMinute;
             minuteText.text = intMinute.ToString();
-            Debug.Log("Meydyaeyeyaheahdha: " + minMinute);
-
             minuteButtonDown.interactable = false;
         }
         else if (intMinute == 00)
@@ -290,6 +287,114 @@ public class TaskManager : MonoBehaviour
             minuteButtonUp.interactable = false;
         else
             minuteButtonUp.interactable = true;
+
+        /*
+        // info o aktualnym czasie z DateTest.cs
+        presentTime = DateTestScript.GetComponent<DateTest>();
+
+        presentDay = int.Parse(presentTime.DTday);
+        presentMonth = int.Parse(presentTime.DTmonth);
+        presentYear = int.Parse(presentTime.DTfullyear);
+        presentHour = int.Parse(presentTime.DThour);
+        presentMinute = int.Parse(presentTime.DTminute);
+
+        if (addTaskPanel.activeSelf)
+        {
+            minDay = presentDay;
+            minMonth = presentMonth;
+            minYear = presentYear;
+            minHour = presentHour;
+            minMinute = presentMinute;
+        }
+        */
+
+        //CorrectFieldCheck();
+        //CorrectDateCheck();
+
+        AddTaskPanelActive(addTaskPanel);
+    }
+
+    private void AddTaskPanelActive(GameObject AddTaskPanel)
+    {
+        Debug.Log("Do you see me?");
+
+        // info o aktualnym czasie z DateTest.cs
+        presentTime = DateTestScript.GetComponent<DateTest>();
+
+        presentDay = int.Parse(presentTime.DTday);
+        presentMonth = int.Parse(presentTime.DTmonth);
+        presentYear = int.Parse(presentTime.DTfullyear);
+        presentHour = int.Parse(presentTime.DThour);
+        presentMinute = int.Parse(presentTime.DTminute);
+
+        if (addTaskPanel.activeSelf)
+        {
+            minDay = presentDay;
+            minMonth = presentMonth;
+            minYear = presentYear;
+            minHour = presentHour;
+            minMinute = presentMinute;
+        }
+    }
+
+    void CorrectDateCheck()
+    {
+        if (intDay < minDay | intMonth < minMonth | intYear < minYear | intHour < minHour | intMinute < minMinute)
+        {
+            //if (nowDay == true & nowMonth == true & nowHour == true)
+                disabledButton = true;
+        }
+
+        //if (string.IsNullOrEmpty(TitleField.text))
+        //    disabledButton = true;
+
+        Debug.Log("TitleField: " + TitleField.text);
+
+        if (disabledButton == true)
+        {
+            CreateTaskButton.interactable = false;
+            Debug.Log("CreateButton disabled" + intMinute + " " + presentMinute);
+
+            wrongDataText.SetActive(true);
+            StartCoroutine(DisplayWrongInfo());
+
+            minDay = presentDay;
+            minMonth = presentMonth;
+            minYear = presentYear;
+            minHour = presentHour;
+            minMinute = presentMinute;
+        }
+        else
+        {
+            CreateTaskButton.interactable = true;
+            Debug.Log("CreateButton able" + intMinute + " " + presentMinute);
+        }
+    }
+
+    public void CorrectFieldCheck()
+    {
+        if (TitleField.text.Length == 0)
+            disabledButton = true;
+
+        if (disabledButton == true)
+        {
+            CreateTaskButton.interactable = false;
+            Debug.Log("CreateButton disabled" + intMinute + " " + presentMinute);
+
+            wrongDataText.SetActive(true);
+            StartCoroutine(DisplayWrongInfo());
+
+            minDay = presentDay;
+            minMonth = presentMonth;
+            minYear = presentYear;
+            minHour = presentHour;
+            minMinute = presentMinute;
+        }
+        else
+        {
+            CreateTaskButton.interactable = true;
+            Debug.Log("CreateButton able" + intMinute + " " + presentMinute);
+        }
     }
 
     public void createNewTask() 
@@ -346,6 +451,13 @@ public class TaskManager : MonoBehaviour
         imageInTask[1].color = selectedColor;
 
         tasksList.Add(taskObject);
+    }
+    public IEnumerator DisplayWrongInfo()
+    {
+        yield return new WaitForSeconds(3.0f);
+        disabledButton = false;
+        CreateTaskButton.interactable = true;
+        wrongDataText.SetActive(false);
     }
 
     // przypisywanie przyciskow / mocking the buttons
