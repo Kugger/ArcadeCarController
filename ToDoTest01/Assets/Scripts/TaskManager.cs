@@ -84,11 +84,41 @@ public class TaskManager : MonoBehaviour
 
     private int presentDay = 1, presentMonth = 1, presentYear = 1, presentHour = 1, presentMinute = 1;
 
+    public class NewTaskList
+    {
+        public string objTitle;
+        public string objText;
+        public string objDay;
+        public string objMonth;
+        public string objYear;
+        public string objHour;
+        public string objMinute;
+        public int objIndex;
+        public Color objColor = new Color(0f, 111f, 73f);
+
+        public NewTaskList(string title, string text, Color color, string day, string month, string year, string hour, string minute, int index)
+        {
+            this.objTitle = title;
+            this.objText = text;
+            this.objColor = color;
+            this.objIndex = index;
+
+            this.objDay = day;
+            this.objMonth = month;
+            this.objYear = year;
+            this.objHour = hour;
+            this.objMinute = minute;
+        }
+    }
+
+    string jsonFileName = "TaskManager.json";
 
     void Start()
     {
         // sciezka do pliku z danymi do taskow
-        filePath = Application.persistentDataPath + "/checklist.txt";
+        // filePath = Application.persistentDataPath + "/checklist.txt";
+        filePath = Path.Combine(Application.persistentDataPath, jsonFileName);
+        readTaskFromJson();
 
         dayText.text = System.DateTime.Now.ToString("dd");
         monthText.text = System.DateTime.Now.ToString("MM");
@@ -107,6 +137,151 @@ public class TaskManager : MonoBehaviour
         minYear = intYear;
         minHour = intHour;
         minMinute = intMinute;
+    }
+
+
+    public void createNewTask() 
+    {
+        string temp = TitleField.text;
+        string temp2 = TextField.text;
+        createButtonPressed(temp, temp2, hardMint, intDay.ToString(), intMonth.ToString(), intYear.ToString(), intHour.ToString(), intMinute.ToString());
+    }
+
+    public void createButtonPressed(string objTitle, string objText, Color objColor, string objDay, string objMonth, string objYear, string objHour, string objMinute, int objIndex = 0)
+    {
+        // inicjalizowanie tasku uzywajac przygotowanego prefabu
+        GameObject task = Instantiate(checklistItemPrefab);
+        // dodatnie taskowi "porzadku"
+        task.transform.SetParent(content);
+        // tworzenie tasku
+        NewTask taskObject = task.GetComponent<NewTask>();
+
+        // indeksowanie tasków
+        int index = 0;
+        if (tasksList.Count == 0)
+            index = 0;
+        else
+            index = tasksList.Count;
+
+        // zbieranie ktory color toggle zostal wybrany
+        foreach (var toggle in ColorToggleGroup.ActiveToggles())
+        {
+            if (toggle.isOn)
+                selectedToggle = toggle;
+        }
+
+        // wybieranie koloru z wybranego toggle w AddTaskPanel
+        Color selectedColor = selectedToggle.GetComponentInChildren<Image>().color;
+
+        // ustawiamy jaki tytul, opis, kolor, date i index taskowi 
+        taskObject.SetObjectInfo(objTitle, objText, objColor, objDay, objMonth, objYear, objHour, objMinute, index);
+        Debug.Log("taskObject name: " + taskObject.objTitle);
+        Debug.Log("taskObject text: " + taskObject.objText);
+        Debug.Log("taskObject index: " + taskObject.objIndex);
+        Debug.Log("taskObject color: " + taskObject.objColor);
+
+        // znajdujemy componenty tekstu i wsadzamy je w liste
+        Text[] textsInTask = taskObject.GetComponentsInChildren<Text>();
+
+        // nadajemy kazdemu odpowiednia wartosc podana przez uzytkownia
+        textsInTask[0].text = objTitle;
+        textsInTask[1].text = objText;
+        textsInTask[2].text = index.ToString();
+        textsInTask[3].text = objDay + "-" + objMonth + "-" + objYear + "   " + objHour + ":" + objMinute;
+
+        // znajdujemy obrazek w prefabie i zmieniamy jego kolor
+        Image[] imageInTask = taskObject.GetComponentsInChildren<Image>();
+        imageInTask[1].color = selectedColor;
+        imageInTask[2].color = selectedColor;
+
+
+
+        tasksList.Add(taskObject);
+
+        saveTaskToJson();
+
+        Debug.Log("Da sie to wyswietlic?" + tasksList[0].objTitle);
+
+    }
+
+    void saveTaskToJson()
+    {
+        string fileContent = "";
+
+        for (int i = 0; i < tasksList.Count; i++)
+        {
+            NewTaskList temp = new NewTaskList(tasksList[i].objTitle, tasksList[i].objText, tasksList[i].objColor, tasksList[i].objDay, 
+                tasksList[i].objMonth, tasksList[i].objYear, tasksList[i].objHour, tasksList[i].objMinute, tasksList[i].objIndex);
+            fileContent += JsonUtility.ToJson(temp) + "\n";
+        }
+
+        System.IO.File.WriteAllText(filePath, fileContent);
+    }
+
+    void readTaskFromJson()
+    {
+        string fileJson = "";
+
+        fileJson = System.IO.File.ReadAllText(filePath);
+
+        string[] splitTextContent = fileJson.Split('\n');
+
+        foreach (string textContent in splitTextContent)
+        {
+            if (textContent.Trim() != "")
+            {
+                NewTaskList temp = JsonUtility.FromJson<NewTaskList>(textContent.Trim());
+                createButtonPressed(temp.objTitle, temp.objText, temp.objColor, temp.objDay, temp.objMonth, temp.objYear, temp.objHour, temp.objMinute, temp.objIndex);
+            }
+        }
+    }
+
+    private void OnEnable()
+    {
+        Debug.Log("Do you see me?");
+
+        // info o aktualnym czasie z DateTest.cs
+        presentTime = DateTestScript.GetComponent<DateTest>();
+
+        presentDay = int.Parse(presentTime.DTday);
+        presentMonth = int.Parse(presentTime.DTmonth);
+        presentYear = int.Parse(presentTime.DTfullyear);
+        presentHour = int.Parse(presentTime.DThour);
+        presentMinute = int.Parse(presentTime.DTminute);
+
+        if (addTaskPanel.activeSelf)
+        {
+            minDay = presentDay;
+            minMonth = presentMonth;
+            minYear = presentYear;
+            minHour = presentHour;
+            minMinute = presentMinute;
+
+            Debug.Log("Tylko raz");
+        }
+    }
+
+    private void OnDisable()
+    {
+        TitleField.text = "";
+        TextField.text = "";
+    }
+
+    public bool CorrectDateCheck()
+    {
+        if (intDay < presentDay | intMonth < presentMonth | intYear < presentYear | intHour < presentHour | intMinute < presentMinute)
+            if (nowDay == true && nowMonth == true && nowHour == true)
+                disabledButton = true;
+
+        return disabledButton;
+    }
+
+    public bool CorrectFieldCheck()
+    {
+        if (TitleField.text.Length == 0)
+            disabledButton = true;
+
+        return disabledButton;
     }
 
     // w DateTest01.cs dale metode Update w public jbc
@@ -288,94 +463,25 @@ public class TaskManager : MonoBehaviour
         else
             minuteButtonUp.interactable = true;
 
-        /*
-        // info o aktualnym czasie z DateTest.cs
-        presentTime = DateTestScript.GetComponent<DateTest>();
 
-        presentDay = int.Parse(presentTime.DTday);
-        presentMonth = int.Parse(presentTime.DTmonth);
-        presentYear = int.Parse(presentTime.DTfullyear);
-        presentHour = int.Parse(presentTime.DThour);
-        presentMinute = int.Parse(presentTime.DTminute);
+        bool disabledByTitle = CorrectFieldCheck();
+        bool disabledByDate = CorrectDateCheck();
 
-        if (addTaskPanel.activeSelf)
+        if (disabledByTitle == true)
         {
-            minDay = presentDay;
-            minMonth = presentMonth;
-            minYear = presentYear;
-            minHour = presentHour;
-            minMinute = presentMinute;
-        }
-        */
-
-        //CorrectFieldCheck();
-        //CorrectDateCheck();
-
-    }
-
-    private void OnEnable()
-    {
-        Debug.Log("Do you see me?");
-
-        // info o aktualnym czasie z DateTest.cs
-        presentTime = DateTestScript.GetComponent<DateTest>();
-
-        presentDay = int.Parse(presentTime.DTday);
-        presentMonth = int.Parse(presentTime.DTmonth);
-        presentYear = int.Parse(presentTime.DTfullyear);
-        presentHour = int.Parse(presentTime.DThour);
-        presentMinute = int.Parse(presentTime.DTminute);
-
-        if (addTaskPanel.activeSelf)
-        {
-            minDay = presentDay;
-            minMonth = presentMonth;
-            minYear = presentYear;
-            minHour = presentHour;
-            minMinute = presentMinute;
-
-            Debug.Log("Tylko raz");
-        }
-    }
-
-    void CorrectDateCheck()
-    {
-        if (intDay < minDay | intMonth < minMonth | intYear < minYear | intHour < minHour | intMinute < minMinute)
-        {
-            //if (nowDay == true & nowMonth == true & nowHour == true)
-                disabledButton = true;
-        }
-
-        //if (string.IsNullOrEmpty(TitleField.text))
-        //    disabledButton = true;
-
-        Debug.Log("TitleField: " + TitleField.text);
-
-        if (disabledButton == true)
-        {
-            CreateTaskButton.interactable = false;
-            Debug.Log("CreateButton disabled" + intMinute + " " + presentMinute);
-
-            wrongDataText.SetActive(true);
-            StartCoroutine(DisplayWrongInfo());
-
-            minDay = presentDay;
-            minMonth = presentMonth;
-            minYear = presentYear;
-            minHour = presentHour;
-            minMinute = presentMinute;
-        }
-        else
-        {
-            CreateTaskButton.interactable = true;
-            Debug.Log("CreateButton able" + intMinute + " " + presentMinute);
-        }
-    }
-
-    public bool CorrectFieldCheck()
-    {
-        if (TitleField.text.Length == 0)
+            disabledByDate = true;
             disabledButton = true;
+        }
+
+        if (disabledByDate == true)
+        {
+            minDay = presentDay;
+            minMonth = presentMonth;
+            minYear = presentYear;
+            minHour = presentHour;
+            minMinute = presentMinute;
+        }
+
 
         if (disabledButton == true)
         {
@@ -397,64 +503,9 @@ public class TaskManager : MonoBehaviour
             Debug.Log("CreateButton able" + intMinute + " " + presentMinute);
         }
 
-        return disabledButton;
+        Debug.Log("disabledButton state: " + disabledButton);
     }
 
-    public void createNewTask() 
-    {
-        string temp = TitleField.text;
-        string temp2 = TextField.text;
-        createButtonPressed(temp, temp2, hardMint);
-
-    }
-
-    public void createButtonPressed(string objTitle, string objText, Color objColor, int objIndex = 0)
-    {
-        // inicjalizowanie tasku uzywajac przygotowanego prefabu
-        GameObject task = Instantiate(checklistItemPrefab);
-        // dodatnie taskowi "porzadku"
-        task.transform.SetParent(content);
-        // tworzenie tasku
-        NewTask taskObject = task.GetComponent<NewTask>();
-
-        // indeksowanie tasków
-        int index = 0;
-        if (tasksList.Count == 0)
-            index = 0;
-        else
-            index = tasksList.Count;
-
-        // zbieranie ktory color toggle zostal wybrany
-        foreach (var toggle in ColorToggleGroup.ActiveToggles())
-        {
-            if (toggle.isOn)
-                selectedToggle = toggle;
-        }
-
-        // wybieranie koloru z wybranego toggle w AddTaskPanel
-        Color selectedColor = selectedToggle.GetComponentInChildren<Image>().color;
-
-        // ustawiamy jaki tytul, opis, kolor i index taskowi 
-        taskObject.SetObjectInfo(objTitle, objText, objColor, index);
-        Debug.Log("taskObject name: " + taskObject.objTitle);
-        Debug.Log("taskObject text: " + taskObject.objText);
-        Debug.Log("taskObject index: " + taskObject.objIndex);
-        Debug.Log("taskObject color: " + taskObject.objColor);
-
-        // znajdujemy componenty tekstu i wsadzamy je w liste
-        Text[] textsInTask = taskObject.GetComponentsInChildren<Text>();
-
-        // nadajemy kazdemu odpowiednia wartosc podana przez uzytkownia
-        textsInTask[0].text = objTitle;
-        textsInTask[1].text = objText;
-        textsInTask[2].text = index.ToString();
-
-        // znajdujemy obrazek w prefabie i zmieniamy jego kolor
-        Image[] imageInTask = taskObject.GetComponentsInChildren<Image>();
-        imageInTask[1].color = selectedColor;
-
-        tasksList.Add(taskObject);
-    }
     public IEnumerator DisplayWrongInfo()
     {
         yield return new WaitForSeconds(3.0f);
