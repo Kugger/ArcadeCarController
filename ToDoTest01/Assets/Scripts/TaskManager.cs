@@ -38,7 +38,7 @@ public class TaskManager : MonoBehaviour
     public Color modernSuit = new Color(67f, 117f, 219f, 1f);
     public Color bookCover = new Color(219f, 67f, 82f, 1f);
     public Color flatPlum = new Color(120f, 36f, 184f, 1f);
-    public Color woodPecker =  new Color(111f, 69f, 14f, 1f);
+    public Color woodPecker = new Color(111f, 69f, 14f, 1f);
     public Color sandCastle = new Color(219f, 168f, 66f, 1f);
 
     [Header("Date and Time Texts")]
@@ -140,11 +140,12 @@ public class TaskManager : MonoBehaviour
     }
 
 
-    public void createNewTask() 
+    public void createNewTask()
     {
         string temp = TitleField.text;
         string temp2 = TextField.text;
-        createButtonPressed(temp, temp2, hardMint, intDay.ToString(), intMonth.ToString(), intYear.ToString(), intHour.ToString(), intMinute.ToString());
+        Color temp3 = flatPlum;
+        createButtonPressed(temp, temp2, temp3, minDay.ToString(), minMonth.ToString(), minYear.ToString(), minHour.ToString(), minMinute.ToString());
     }
 
     public void createButtonPressed(string objTitle, string objText, Color objColor, string objDay, string objMonth, string objYear, string objHour, string objMinute, int objIndex = 0)
@@ -175,10 +176,12 @@ public class TaskManager : MonoBehaviour
 
         // ustawiamy jaki tytul, opis, kolor, date i index taskowi 
         taskObject.SetObjectInfo(objTitle, objText, objColor, objDay, objMonth, objYear, objHour, objMinute, index);
+        /*
         Debug.Log("taskObject name: " + taskObject.objTitle);
         Debug.Log("taskObject text: " + taskObject.objText);
         Debug.Log("taskObject index: " + taskObject.objIndex);
         Debug.Log("taskObject color: " + taskObject.objColor);
+        */
 
         // znajdujemy componenty tekstu i wsadzamy je w liste
         Text[] textsInTask = taskObject.GetComponentsInChildren<Text>();
@@ -200,7 +203,7 @@ public class TaskManager : MonoBehaviour
 
         saveTaskToJson();
 
-        Debug.Log("Da sie to wyswietlic?" + tasksList[0].objTitle);
+        //Debug.Log("Da sie to wyswietlic?" + tasksList[0].objTitle);
 
     }
 
@@ -210,7 +213,7 @@ public class TaskManager : MonoBehaviour
 
         for (int i = 0; i < tasksList.Count; i++)
         {
-            NewTaskList temp = new NewTaskList(tasksList[i].objTitle, tasksList[i].objText, tasksList[i].objColor, tasksList[i].objDay, 
+            NewTaskList temp = new NewTaskList(tasksList[i].objTitle, tasksList[i].objText, tasksList[i].objColor, tasksList[i].objDay,
                 tasksList[i].objMonth, tasksList[i].objYear, tasksList[i].objHour, tasksList[i].objMinute, tasksList[i].objIndex);
             fileContent += JsonUtility.ToJson(temp) + "\n";
         }
@@ -238,7 +241,7 @@ public class TaskManager : MonoBehaviour
 
     private void OnEnable()
     {
-        Debug.Log("Do you see me?");
+       // Debug.Log("Do you see me?");
 
         // info o aktualnym czasie z DateTest.cs
         presentTime = DateTestScript.GetComponent<DateTest>();
@@ -257,7 +260,7 @@ public class TaskManager : MonoBehaviour
             minHour = presentHour;
             minMinute = presentMinute;
 
-            Debug.Log("Tylko raz");
+            //Debug.Log("Tylko raz");
         }
     }
 
@@ -287,6 +290,8 @@ public class TaskManager : MonoBehaviour
     // w DateTest01.cs dale metode Update w public jbc
     void Update()
     {
+        Debug.Log("Da sie to wyswietlic?" + tasksList.Count);
+
         // sprawdzanie czy rok jest przestepny
         if (intYear % 4 == 0)
         {
@@ -486,7 +491,7 @@ public class TaskManager : MonoBehaviour
         if (disabledButton == true)
         {
             CreateTaskButton.interactable = false;
-            Debug.Log("CreateButton disabled" + intMinute + " " + presentMinute);
+            //Debug.Log("CreateButton disabled" + intMinute + " " + presentMinute);
 
             wrongDataText.SetActive(true);
             StartCoroutine(DisplayWrongInfo());
@@ -500,10 +505,10 @@ public class TaskManager : MonoBehaviour
         else
         {
             CreateTaskButton.interactable = true;
-            Debug.Log("CreateButton able" + intMinute + " " + presentMinute);
+            //Debug.Log("CreateButton able" + intMinute + " " + presentMinute);
         }
 
-        Debug.Log("disabledButton state: " + disabledButton);
+        //Debug.Log("disabledButton state: " + disabledButton);
     }
 
     public IEnumerator DisplayWrongInfo()

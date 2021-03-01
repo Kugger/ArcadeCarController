@@ -40,7 +40,7 @@ public class NewTask : MonoBehaviour
         this.objMonth = month;
         this.objYear = year;
         this.objHour = hour;
-        this.objMinute = minute; 
+        this.objMinute = minute;
     }
 
 }
